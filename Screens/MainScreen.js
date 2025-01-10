@@ -47,7 +47,7 @@ const MainScreen = ({ navigation }) => {
     <View style={styles.container}>
 
       
-      <RoundedImage source={require('../assets/library.jpg')} style={styles.topImage} />
+      <RoundedImage source={require('../assets/library.jpeg')} style={styles.topImage} />
 
      
       <View style={styles.cardsContainer}>
