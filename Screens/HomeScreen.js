@@ -1,23 +1,20 @@
 import React from 'react';
 import { View, Text, Image, ImageBackground, StyleSheet, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; 
+import { LinearGradient } from 'expo-linear-gradient';
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = ({ navigation }) => { // Recibe la prop navigation
   const handleLogin = () => {
-    navigation.navigate('Login'); 
+    navigation.navigate('Auth'); // Navegación correcta a AuthScreen
   };
 
-  const handleCreateAccount = () => {
-    alert('Redirigiendo a la creación de cuenta...');
-  };
 
   return (
     <ImageBackground
-      source={require('../assets/background.jpeg')} 
+      source={require('../assets/background.jpeg')}
       style={styles.background}
     >
       <LinearGradient
-        colors={['rgba(0,0,0,0.7)', 'transparent']} 
+        colors={['rgba(0,0,0,0.7)', 'transparent']}
         style={styles.gradient}
       />
 
@@ -25,17 +22,18 @@ const HomeScreen = ({ navigation }) => {
         source={require('../assets/logo.png')}
         style={styles.logo}
       />
-      
+
       <Text style={styles.appName}>Elephocus</Text>
 
       <View style={styles.bottomContainer}>
+      
         <TouchableOpacity style={styles.startButton} onPress={handleLogin}>
           <Text style={styles.startButtonText}>Iniciar</Text>
         </TouchableOpacity>
 
         <View style={styles.createAccountContainer}>
           <Text style={styles.noAccountText}>¿No tienes una cuenta? </Text>
-          <TouchableOpacity onPress={handleCreateAccount}>
+          <TouchableOpacity onPress={handleLogin}>
             <Text style={styles.createAccountLink}>Crea una aquí</Text>
           </TouchableOpacity>
         </View>

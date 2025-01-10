@@ -1,33 +1,47 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const users = [
-    { username: 'Juzzo', password: '123' },
-    { username: 'Ricardo', password: '456' },
-  ];
-
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (username === '' || password === '') {
-      Alert.alert('Por favor ingresa todos los campos');
+      Alert.alert('Error', 'Por favor ingresa todos los campos.');
       return;
     }
 
-    const user = users.find(user => user.username === username && user.password === password);
+    try {
+      // Obtiene usuario de AsyncStorage
+      const userString = await AsyncStorage.getItem(username);
+      if (userString === null) {
+        Alert.alert('Error', 'Usuario no encontrado.');
+        return;
+      }
 
-    if (user) {
-      Alert.alert(`Bienvenido ${username}`);
-      navigation.navigate('Main'); 
-    } else {
-      Alert.alert('Credenciales incorrectas');
+      const user = JSON.parse(userString);
+
+      // Verifica contraseña
+      if (user.password === password) {
+        Alert.alert('Éxito', `Bienvenido ${username}`);
+        navigation.navigate('Main');
+      } else {
+        Alert.alert('Error', 'Contraseña incorrecta.');
+      }
+
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Hubo un problema al iniciar sesión.');
     }
   };
 
   const handleCreateAccount = () => {
-    Alert.alert('Redirigiendo a la creación de cuenta...');
+    navigation.navigate('Register'); // Navegar a la pantalla de registro
+  };
+
+  const handleForgotPassword = () => {
+        Alert.alert('Redirigiendo a recuperación de contraseña...');
   };
 
   return (
@@ -47,13 +61,14 @@ const LoginScreen = ({ navigation }) => {
         onChangeText={setPassword}
       />
       <Button title="Iniciar Sesión" onPress={handleLogin} color="#800080" />
+
       <Text style={styles.linkText}>
         ¿No tienes una cuenta?{' '}
         <TouchableOpacity onPress={handleCreateAccount}>
           <Text style={styles.link}>Crea una aquí</Text>
         </TouchableOpacity>
       </Text>
-      <TouchableOpacity onPress={() => Alert.alert('Redirigiendo a recuperación de contraseña...')}>
+      <TouchableOpacity onPress={handleForgotPassword}>
         <Text style={styles.link}>¿Olvidaste tu contraseña?</Text>
       </TouchableOpacity>
     </View>
