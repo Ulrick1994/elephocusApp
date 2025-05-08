@@ -8,24 +8,23 @@ const BottomNavBar = ({
   onAddPress,
   onListPress,
   onSettingsPress,
-  navigation, 
+  navigation,
 }) => {
   return (
     <View style={styles.bottomNavBar}>
-      <TouchableOpacity onPress={onHomePress}>
+      <TouchableOpacity onPress={() => navigation.navigate("Main")}>
         <FontAwesome name="home" size={24} color="white" />
       </TouchableOpacity>
-      <TouchableOpacity onPress={onBookPress}>
+      <TouchableOpacity onPress={() => navigation.navigate("CatalogoFlashcards")}>
         <FontAwesome name="book" size={24} color="white" />
       </TouchableOpacity>
-      <TouchableOpacity onPress={onAddPress} style={styles.addButton}>
+      <TouchableOpacity onPress={() => navigation.navigate("CrearFlashcard")} style={styles.addButton}>
         <MaterialIcons name="add" size={32} color="white" />
       </TouchableOpacity>
-      {/* Botón "List" que navega a "CatalogoTemario" */}
       <TouchableOpacity onPress={() => navigation.navigate("CatalogoTemario")}>
         <FontAwesome name="list" size={24} color="white" />
       </TouchableOpacity>
-      <TouchableOpacity onPress={onSettingsPress}>
+      <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
         <MaterialIcons name="settings" size={24} color="white" />
       </TouchableOpacity>
     </View>

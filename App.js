@@ -1,15 +1,15 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import HomeScreen from './Screens/HomeScreen';
-import MainScreen from './Screens/MainScreen';
-import CrearFlashcardScreen from './Screens/CreateFlashcard';
-import CatalogoFlashcardsScreen from './Screens/CatalogueFlashcards';
-import RegisterScreen from './Screens/RegisterScreen';
-import AuthScreen from './Screens/AuthScreen';
-import SettingsScreen from './Screens/SettingsScreen';
-import CatalogoTemario from './Screens/CatalogoTemario';
-import ResetPasswordScreen from './Screens/ResetPasswordScreen';
+import HomeScreen from './Views/Main/HomeScreen';
+import MainScreen from './Views/Main/MainScreen';
+import CrearFlashcardScreen from './Views/Flashcards/CreateFlashcard';
+import CatalogoFlashcardsScreen from './Views/Flashcards/CatalogueFlashcards';
+import RegisterScreen from './Views/Auth/RegisterScreen';
+import AuthScreen from './Views/Auth/AuthScreen';
+import SettingsScreen from './Views/Main/SettingsScreen';
+import CatalogoTemario from './Views/Flashcards/CatalogoTemario';
+import ResetPasswordScreen from './Views/Auth/ResetPasswordScreen';
 import { useFonts } from 'expo-font';
 
 const Stack = createStackNavigator();
