@@ -15,15 +15,15 @@ const BottomNavBar = ({
       <TouchableOpacity onPress={() => navigation.navigate("Main")}>
         <FontAwesome name="home" size={24} color="white" />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("CatalogoFlashcards")}>
-        <FontAwesome name="book" size={24} color="white" />
+      <TouchableOpacity onPress={() => navigation.navigate("Eventos")}>
+        <FontAwesome name="calendar" size={24} color="white" />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("CrearFlashcard")} style={styles.addButton}>
         <MaterialIcons name="add" size={32} color="white" />
       </TouchableOpacity>
       {/* Redirige ahora a Eventos en lugar de CatalogoTemario */}
-      <TouchableOpacity onPress={() => navigation.navigate("Eventos")}>
-        <FontAwesome name="calendar" size={24} color="white" />
+      <TouchableOpacity onPress={() => navigation.navigate("CatalogoTemario")}>
+        <FontAwesome name="book" size={24} color="white" />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
         <MaterialIcons name="settings" size={24} color="white" />
