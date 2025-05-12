@@ -21,8 +21,9 @@ const BottomNavBar = ({
       <TouchableOpacity onPress={() => navigation.navigate("CrearFlashcard")} style={styles.addButton}>
         <MaterialIcons name="add" size={32} color="white" />
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("CatalogoTemario")}>
-        <FontAwesome name="list" size={24} color="white" />
+      {/* Redirige ahora a Eventos en lugar de CatalogoTemario */}
+      <TouchableOpacity onPress={() => navigation.navigate("Eventos")}>
+        <FontAwesome name="calendar" size={24} color="white" />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
         <MaterialIcons name="settings" size={24} color="white" />
