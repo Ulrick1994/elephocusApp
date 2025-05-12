@@ -1,5 +1,11 @@
-import React, { useState, useRef } from "react";
-import { Text, TouchableOpacity, Animated, StyleSheet, View } from "react-native";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Text,
+  TouchableOpacity,
+  Animated,
+  StyleSheet,
+  View,
+} from "react-native";
 
 const Flashcard = ({ pregunta, respuesta }) => {
   const [isFlipped, setIsFlipped] = useState(false);
@@ -15,7 +21,6 @@ const Flashcard = ({ pregunta, respuesta }) => {
     });
   };
 
-  // Gira la tarjeta
   const frontInterpolate = rotateAnim.interpolate({
     inputRange: [0, 1],
     outputRange: ["0deg", "180deg"],
@@ -26,6 +31,10 @@ const Flashcard = ({ pregunta, respuesta }) => {
     outputRange: ["180deg", "360deg"],
   });
 
+  // Colores para cada cara
+  const frontColor = "#D4B2DA"; // Morado claro
+  const backColor = "#543C3C"; // Café oscuro
+
   return (
     <TouchableOpacity onPress={flipCard} activeOpacity={0.8}>
       <View style={styles.cardContainer}>
@@ -34,7 +43,10 @@ const Flashcard = ({ pregunta, respuesta }) => {
           style={[
             styles.card,
             styles.cardFront,
-            { transform: [{ rotateY: frontInterpolate }] },
+            {
+              transform: [{ rotateY: frontInterpolate }],
+              backgroundColor: frontColor,
+            },
           ]}
         >
           <Text style={styles.text}>{pregunta}</Text>
@@ -45,7 +57,10 @@ const Flashcard = ({ pregunta, respuesta }) => {
           style={[
             styles.card,
             styles.cardBack,
-            { transform: [{ rotateY: backInterpolate }] },
+            {
+              transform: [{ rotateY: backInterpolate }],
+              backgroundColor: backColor,
+            },
           ]}
         >
           <Text style={styles.text}>{respuesta}</Text>
@@ -73,10 +88,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   cardFront: {
-    backgroundColor: "#D4B2DA",
+    // backgroundColor: "#D4B2DA", // Morado claro (ahora se pasa dinámicamente)
   },
   cardBack: {
-    backgroundColor: "#543C3C",
+    // backgroundColor: "#543C3C", // Café oscuro (ahora se pasa dinámicamente)
     transform: [{ rotateY: "180deg" }],
   },
   text: {
