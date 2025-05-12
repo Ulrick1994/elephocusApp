@@ -5,11 +5,13 @@ import HomeScreen from './Views/Main/HomeScreen';
 import MainScreen from './Views/Main/MainScreen';
 import CrearFlashcardScreen from './Views/Flashcards/CreateFlashcard';
 import CatalogoFlashcardsScreen from './Views/Flashcards/CatalogueFlashcards';
+import CatalogoTemario from './Views/Flashcards/CatalogoTemario';
 import RegisterScreen from './Views/Auth/RegisterScreen';
 import AuthScreen from './Views/Auth/AuthScreen';
 import SettingsScreen from './Views/Main/SettingsScreen';
-import CatalogoTemario from './Views/Flashcards/CatalogoTemario';
 import ResetPasswordScreen from './Views/Auth/ResetPasswordScreen';
+import EventosScreen from './Views/Flashcards/EventosScreen';
+import SeleccionarFlashcardsScreen from './Views/Flashcards/SeleccionarFlashcardsScreen';
 import { useFonts } from 'expo-font';
 
 const Stack = createStackNavigator();
@@ -32,10 +34,12 @@ const App = () => {
         <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} options={{ headerShown: false }} />
         <Stack.Screen name="CrearFlashcard" component={CrearFlashcardScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="CatalogoTemario" component={CatalogoTemario} options={{ headerShown: false }} />
         <Stack.Screen name="CatalogoFlashcards" component={CatalogoFlashcardsScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
         <Stack.Screen name="Settings" component={SettingsScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="CatalogoTemario" component={CatalogoTemario} options={{ headerShown: false }} />
+        <Stack.Screen name="Eventos" component={EventosScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="SeleccionarFlashcards" component={SeleccionarFlashcardsScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
