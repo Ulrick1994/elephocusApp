@@ -1,34 +1,31 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import { getFriendlyFirebaseErrorMessage } from '../utils/firebaseErrorUtils.jsx'; 
 
 class RegisterViewModel {
   async handleRegister(email, username, password, confirmPassword, onSuccess, onError) {
+    console.log("[RegisterViewModel] >>> Iniciando handleRegister con:", { email, username: username.substring(0,3) + '...' });
+
     if (!email || !username || !password || !confirmPassword) {
-      onError('Por favor completa todos los campos.');
+      if (onError) onError('Por favor completa todos los campos.');
       return;
     }
-
     if (password !== confirmPassword) {
-      onError('Las contraseñas no coinciden.');
+      if (onError) onError('Las contraseñas no coinciden.');
       return;
     }
 
     try {
-      const storedUsers = await AsyncStorage.getItem('users');
-      const users = storedUsers ? JSON.parse(storedUsers) : [];
-
-      if (users.some(user => user.email === email || user.username === username)) {
-        onError('Este correo o nombre de usuario ya está registrado.');
-        return;
-      }
-
-      const newUser = { id: Date.now().toString(), email, username, password };
-      users.push(newUser);
-      await AsyncStorage.setItem('users', JSON.stringify(users));
-
-      onSuccess('Usuario registrado correctamente.');
+      console.log("[RegisterViewModel] --- Intentando firebase.auth().createUserWithEmailAndPassword...");
+      const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+      console.log('[RegisterViewModel] ✅✅✅ ÉXITO al crear usuario en Firebase Auth. UID:', user.uid);
+      
+      if (onSuccess) onSuccess('¡Usuario registrado exitosamente en Firebase!');
     } catch (error) {
-      console.error('Error al registrar usuario:', error);
-      onError('Hubo un problema al registrar el usuario.');
+      console.error('[RegisterViewModel] 🛑🛑🛑 ERROR COMPLETO al crear usuario en Firebase:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      const friendlyErrorMessage = getFriendlyFirebaseErrorMessage(error); 
+      if (onError) onError(friendlyErrorMessage);
     }
   }
 }

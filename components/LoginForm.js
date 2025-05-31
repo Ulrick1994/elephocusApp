@@ -1,46 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react"; // Importa useMemo
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Alert,
+  Alert, 
 } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import LoginScreenViewModel from '../viewmodels/LoginScreenViewModel'; 
 
 const LoginForm = ({ navigation }) => {
-  const [identifier, setIdentifier] = useState("");
+  const [identifier, setIdentifier] = useState(""); 
   const [password, setPassword] = useState("");
+  const viewModel = useMemo(() => new LoginScreenViewModel(navigation), [navigation]);
 
-  const handleLogin = async () => {
-    if (!identifier || !password) {
-      Alert.alert("Error", "Por favor, completa todos los campos.");
-      return;
-    }
-
-    try {
-      const storedData = await AsyncStorage.getItem("users");
-      const users = storedData ? JSON.parse(storedData) : [];
-
-      // Buscar por correo o nombre de usuario
-      const user = users.find(
-        (u) => u.email === identifier || u.username === identifier
-      );
-
-      if (user && user.password === password) {
-        // Guardar el ID del usuario actual en AsyncStorage
-        await AsyncStorage.setItem("currentUserId", user.id);
-
-        Alert.alert("Éxito", "Inicio de sesión exitoso!");
-        navigation.navigate("Main");
-      } else {
-        Alert.alert("Error", "Credenciales incorrectas.");
-      }
-    } catch (error) {
-      console.error("Error al iniciar sesión:", error);
-      Alert.alert("Error", "Hubo un problema al iniciar sesión.");
-    }
+  const handleLoginAttempt = async () => {
+    await viewModel.handleLogin(identifier, password); 
   };
 
   return (
@@ -48,9 +24,10 @@ const LoginForm = ({ navigation }) => {
       <Text style={styles.welcomeText}>Welcome to Elephocus</Text>
       <TextInput
         style={styles.input}
-        placeholder="E-mail or Username"
+        placeholder="E-mail" 
         value={identifier}
         onChangeText={setIdentifier}
+        keyboardType="email-address" 
         autoCapitalize="none"
       />
       <TextInput
@@ -60,7 +37,7 @@ const LoginForm = ({ navigation }) => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+      <TouchableOpacity style={styles.loginButton} onPress={handleLoginAttempt}>
         <Text style={styles.loginButtonText}>LOGIN</Text>
       </TouchableOpacity>
     </View>

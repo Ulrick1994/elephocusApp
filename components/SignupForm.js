@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Crypto from 'expo-crypto';
 
-const SignupForm = () => {
+import RegisterViewModel from '../viewmodels/RegisterViewModel'; 
+
+const SignupForm = ({ navigation }) => { 
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -20,27 +20,22 @@ const SignupForm = () => {
       return;
     }
 
-    try {
-      const storedData = await AsyncStorage.getItem('users');
-      const users = storedData ? JSON.parse(storedData) : [];
-
-      if (users.some(u => u.email === email || u.username === username)) {
-        Alert.alert('Error', 'Este correo o nombre de usuario ya está registrado.');
-        return;
+    RegisterViewModel.handleRegister(
+      email,
+      username,
+      password,
+      confirmPassword,
+      (successMessage) => { // Función onSuccess
+        Alert.alert('Éxito', successMessage);
+        setEmail('');
+        setUsername('');
+        setPassword('');
+        setConfirmPassword('');
+      },
+      (errorMessage) => { 
+        Alert.alert('Error', errorMessage);
       }
-
-      // Generar un UUID para el nuevo usuario usando expo-crypto
-      const userId = Crypto.randomUUID();
-
-   
-      users.push({ id: userId, email, username, password });
-      await AsyncStorage.setItem('users', JSON.stringify(users));
-      Alert.alert('Éxito', 'Registro exitoso!');
-    
-    } catch (error) {
-      console.error('Error al registrar:', error);
-      Alert.alert('Error', 'Hubo un problema al registrar el usuario.');
-    }
+    );
   };
 
   return (
@@ -56,7 +51,7 @@ const SignupForm = () => {
       />
       <TextInput
         style={styles.input}
-        placeholder="Username" // Campo para el nombre de usuario
+        placeholder="Username"
         value={username}
         onChangeText={setUsername}
         autoCapitalize="none"

@@ -1,45 +1,39 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 import { Alert } from 'react-native';
-
+import { getFriendlyFirebaseErrorMessage } from '../utils/firebaseErrorUtils.js'; 
 class LoginScreenViewModel {
   constructor(navigation) {
-    this.navigation = navigation;
+    this.navigation = navigation; 
   }
 
-  async handleLogin(username, password) {
-    if (username === '' || password === '') {
-      Alert.alert('Error', 'Por favor ingresa todos los campos.');
+  async handleLogin(email, password) { 
+    if (!email || !password) {
+      Alert.alert('Error', 'Por favor, ingresa tu correo y contraseña.');
       return;
     }
+    console.log(`[LoginScreenViewModel] >>> Intentando iniciar sesión con Email: ${email}`);
 
     try {
-      const userString = await AsyncStorage.getItem(username);
-      if (userString === null) {
-        Alert.alert('Error', 'Usuario no encontrado.');
-        return;
-      }
-
-      const user = JSON.parse(userString);
-
-      if (user.password === password) {
-        Alert.alert('Éxito', `Bienvenido ${username}`);
-        this.navigation.navigate('Main');
-      } else {
-        Alert.alert('Error', 'Contraseña incorrecta.');
-      }
-
+      const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+      console.log('[LoginScreenViewModel] ✅✅✅ ÉXITO al iniciar sesión. Usuario UID:', user.uid, "Email:", user.email);
+      
+      Alert.alert('Éxito', `¡Bienvenido de nuevo!`);
+    
     } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Hubo un problema al iniciar sesión.');
+      console.error('[LoginScreenViewModel] 🛑🛑🛑 ERROR COMPLETO al iniciar sesión:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
+      const friendlyErrorMessage = getFriendlyFirebaseErrorMessage(error);
+      Alert.alert('Error', friendlyErrorMessage);
     }
   }
 
   handleCreateAccount() {
-    this.navigation.navigate('Register');
+    this.navigation.navigate('Auth'); 
   }
 
   handleForgotPassword() {
-    Alert.alert('Redirigiendo a recuperación de contraseña...');
+    this.navigation.navigate('ResetPassword');
   }
 }
 

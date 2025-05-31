@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "elephocus",
-    "slug": "elephocus",
+    "name": "Elephocus",
+    "slug": "Elephocus",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -19,10 +19,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.JuzzAnthony.elephocus"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "dc7508bf-0d22-4bf7-8e6a-60261b838ac8"
+      }
     }
   }
 }
