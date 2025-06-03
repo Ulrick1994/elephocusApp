@@ -1,7 +1,7 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import { Alert } from 'react-native';
-import { getFriendlyFirebaseErrorMessage } from '../utils/firebaseErrorUtils.js'; 
+import { getFriendlyFirebaseErrorMessage } from '../utils/firebaseErrorUtils.jsx'; 
 class LoginScreenViewModel {
   constructor(navigation) {
     this.navigation = navigation; 
@@ -20,7 +20,7 @@ class LoginScreenViewModel {
       console.log('[LoginScreenViewModel] ✅✅✅ ÉXITO al iniciar sesión. Usuario UID:', user.uid, "Email:", user.email);
       
       Alert.alert('Éxito', `¡Bienvenido de nuevo!`);
-    
+      
     } catch (error) {
       console.error('[LoginScreenViewModel] 🛑🛑🛑 ERROR COMPLETO al iniciar sesión:', JSON.stringify(error, Object.getOwnPropertyNames(error), 2));
       const friendlyErrorMessage = getFriendlyFirebaseErrorMessage(error);

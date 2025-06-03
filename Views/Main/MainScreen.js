@@ -1,47 +1,62 @@
-import React from "react";
-import { View, FlatList } from "react-native";
+import React from "react"; // Asegúrate de que React esté importado
+import { View, FlatList, Text, StyleSheet } from "react-native"; // Añade Text y StyleSheet
 import { useFonts } from "expo-font";
 import BottomNavBar from "../../components/BottomNavBar";
 import Flashcard from "../../components/Flashcard";
 import RoundedImage from '../../components/RoundedImage';
 import useMainScreenViewModel from "../../viewmodels/MainScreenViewModel";
-import styles from "../../styles/MainScreenStyles";
+import stylesImportados from "../../styles/MainScreenStyles"; // Usaremos estos como base
 
 const MainScreen = ({ navigation }) => {
-  const { flashcards } = useMainScreenViewModel();
+  const { flashcards } = useMainScreenViewModel(); // Obtiene flashcards del ViewModel
   const [fontsLoaded] = useFonts({
     "Oleo Script": require("../../assets/fonts/OleoScript-Regular.ttf"),
     "Oleo Script Bold": require("../../assets/fonts/OleoScript-Bold.ttf"),
   });
 
+  // --- LOGS DE DEPURACIÓN Y SALVAGUARDA ---
+  console.log("[MainScreen] Renderizando. 'flashcards' del ViewModel antes de salvaguarda:", flashcards);
+  const flashcardsParaFlatList = Array.isArray(flashcards) ? flashcards : [];
+  console.log("[MainScreen] Renderizando. 'flashcardsParaFlatList' (después de salvaguarda):", flashcardsParaFlatList.length, "elementos");
+  // --- FIN DE LOGS DE DEPURACIÓN Y SALVAGUARDA ---
+
   if (!fontsLoaded) {
-    return null;
+    // Podrías mostrar un ActivityIndicator aquí también si la carga de fuentes tarda
+    return null; 
   }
 
   const renderFlashcard = ({ item }) => (
-    <View style={styles.cardWrapper}>
+    // Usamos el estilo cardWrapper de tus estilos importados
+    <View style={stylesImportados.cardWrapper}> 
       <Flashcard pregunta={item.pregunta} respuesta={item.respuesta} />
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      <RoundedImage source={require('../../assets/library.jpeg')} style={styles.topImage} />
+    // Usamos el estilo container de tus estilos importados
+    <View style={stylesImportados.container}> 
+      <RoundedImage source={require('../../assets/library.jpeg')} style={stylesImportados.topImage} />
 
-      <View style={styles.cardsContainer}>
-        {flashcards.length > 0 ? (
+      {/* Usamos el estilo cardsContainer de tus estilos importados */}
+      <View style={stylesImportados.cardsContainer}> 
+        {/* Usamos flashcardsParaFlatList.length para la condición */}
+        {flashcardsParaFlatList.length > 0 ? (
           <FlatList
-            data={flashcards}
+            data={flashcardsParaFlatList} // Usamos la variable salvaguardada
             renderItem={renderFlashcard}
-            keyExtractor={(item, index) => index.toString()}
+            // Es mejor usar un 'id' único de tus datos flashcard si lo tienen.
+            // Si tus flashcards (de AsyncStorage por ahora) no tienen un id único, index es un fallback.
+            // Cuando migremos flashcards a Firestore, tendrán un ID único.
+            keyExtractor={(item, index) => item.id ? item.id.toString() : index.toString()} 
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.flatListContent}
+            contentContainerStyle={stylesImportados.flatListContent} // Usando estilo importado
           />
         ) : (
-          <View style={styles.emptyContainer}>
-            <Flashcard
+          // Usamos el estilo emptyContainer de tus estilos importados
+          <View style={stylesImportados.emptyContainer}> 
+            <Flashcard // Este componente Flashcard es el tuyo
               pregunta="No hay flashcards disponibles"
               respuesta="Crea nuevas flashcards para comenzar"
             />
@@ -60,5 +75,6 @@ const MainScreen = ({ navigation }) => {
     </View>
   );
 };
+
 
 export default MainScreen;

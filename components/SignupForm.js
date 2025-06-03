@@ -1,38 +1,44 @@
+// components/SignupForm.js
+
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+// Importamos el componente de iconos
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 
-import RegisterViewModel from '../viewmodels/RegisterViewModel'; 
+import RegisterViewModel from '../viewmodels/RegisterViewModel';
 
-const SignupForm = ({ navigation }) => { 
+const SignupForm = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  // Nuevos estados para la visibilidad de las contraseñas
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
 
   const handleSignup = async () => {
     if (!email || !username || !password || !confirmPassword) {
       Alert.alert('Error', 'Por favor, completa todos los campos.');
       return;
     }
-
     if (password !== confirmPassword) {
       Alert.alert('Error', 'Las contraseñas no coinciden.');
       return;
     }
-
     RegisterViewModel.handleRegister(
       email,
       username,
       password,
       confirmPassword,
-      (successMessage) => { // Función onSuccess
+      (successMessage) => {
         Alert.alert('Éxito', successMessage);
         setEmail('');
         setUsername('');
         setPassword('');
         setConfirmPassword('');
       },
-      (errorMessage) => { 
+      (errorMessage) => {
         Alert.alert('Error', errorMessage);
       }
     );
@@ -56,20 +62,49 @@ const SignupForm = ({ navigation }) => {
         onChangeText={setUsername}
         autoCapitalize="none"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
+      
+      {/* Campo de Contraseña con icono para ver/ocultar */}
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!isPasswordVisible} // Visibilidad controlada por el estado
+        />
+        <TouchableOpacity 
+          onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+          style={styles.eyeIcon}
+        >
+          <MaterialCommunityIcons 
+            name={isPasswordVisible ? "eye-off" : "eye"} 
+            size={24} 
+            color="grey" 
+          />
+        </TouchableOpacity>
+      </View>
+
+      {/* Campo de Confirmar Contraseña con icono para ver/ocultar */}
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry={!isConfirmPasswordVisible} // Visibilidad controlada por el estado
+        />
+        <TouchableOpacity 
+          onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
+          style={styles.eyeIcon}
+        >
+          <MaterialCommunityIcons 
+            name={isConfirmPasswordVisible ? "eye-off" : "eye"} 
+            size={24} 
+            color="grey" 
+          />
+        </TouchableOpacity>
+      </View>
+
       <TouchableOpacity style={styles.signupButton} onPress={handleSignup}>
         <Text style={styles.signupButtonText}>SIGN UP</Text>
       </TouchableOpacity>
@@ -90,13 +125,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 20,
   },
-  input: {
+  input: { // Estilo para inputs normales (email, username)
     height: 45,
     borderColor: '#000000',
     borderWidth: 0,
     borderBottomWidth: 1,
     marginBottom: 15,
     paddingHorizontal: 10,
+  },
+  passwordContainer: { // Contenedor para el input de contraseña y el icono
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderColor: '#000000',
+    marginBottom: 15,
+  },
+  passwordInput: { // Estilo para el TextInput de contraseña
+    flex: 1,
+    height: 45,
+    paddingHorizontal: 10,
+  },
+  eyeIcon: { // Estilo para el icono del ojo
+    padding: 10,
   },
   signupButton: {
     backgroundColor: '#800080',

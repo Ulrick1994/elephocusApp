@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react'; 
+// App.js
+
+import React, { useState, useEffect } from 'react';
 import firebase from 'firebase/compat/app';
-import 'firebase/compat/auth'; 
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-//Importación de pantallas
 import HomeScreen from './Views/Main/HomeScreen';
 import AuthScreen from './Views/Auth/AuthScreen';
 import MainScreen from './Views/Main/MainScreen';
@@ -18,7 +20,7 @@ import EventosScreen from './Views/Flashcards/EventosScreen';
 import SeleccionarFlashcardsScreen from './Views/Flashcards/SeleccionarFlashcardsScreen';
 
 import { useFonts } from 'expo-font';
-import { ActivityIndicator, View } from 'react-native'; 
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBzBiX4RqKGo7v4NPbu4dY81jI5uQck-u0",
@@ -49,20 +51,55 @@ const App = () => {
   const [user, setUser] = useState(null); 
 
   useEffect(() => {
-    const subscriber = firebase.auth().onAuthStateChanged(firebaseUser => {
-      console.log('Auth State Changed. User:', firebaseUser ? firebaseUser.uid : null);
-      setUser(firebaseUser); 
+    const subscriber = firebase.auth().onAuthStateChanged(async firebaseUser => {
+      if (firebaseUser) {
+        console.log('App.js - Auth State Changed: User Logged IN. UID:', firebaseUser.uid);
+        try {
+          const userDocRef = firebase.firestore().collection('users').doc(firebaseUser.uid);
+          const userDoc = await userDocRef.get();
+
+          if (userDoc.exists) {
+            const firestoreData = userDoc.data();
+            console.log('App.js - Documento de usuario encontrado en Firestore:', firestoreData);
+            // --- CAMBIO AQUÍ: Creamos un objeto de perfil más simple ---
+            setUser({ 
+              uid: firebaseUser.uid, 
+              email: firebaseUser.email, // De Firebase Auth
+              username: firestoreData.username, // De Firestore
+              createdAt: firestoreData.createdAt // De Firestore (si lo necesitas)
+              // Puedes añadir aquí otros campos de firestoreData que quieras tener globalmente disponibles
+            }); 
+          } else {
+            console.warn('App.js - Usuario autenticado (UID:', firebaseUser.uid, ') pero no se encontró documento de perfil en Firestore.');
+            // Guardar solo la información básica de Auth si no hay perfil en Firestore
+            setUser({ 
+              uid: firebaseUser.uid, 
+              email: firebaseUser.email 
+            });
+          }
+        } catch (error) {
+          console.error("App.js - Error al obtener perfil de usuario de Firestore:", error);
+          // En caso de error, guardar solo la información básica de Auth
+          setUser({ 
+            uid: firebaseUser.uid, 
+            email: firebaseUser.email 
+          });
+        }
+      } else {
+        console.log('App.js - Auth State Changed: User Logged OUT.');
+        setUser(null);
+      }
       if (initializing) {
         setInitializing(false);
       }
     });
-
+    
     return subscriber; 
   }, []); 
 
   if (!fontsLoaded || initializing) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#800080" />
       </View>
     );
@@ -71,8 +108,9 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user ? (
+        {user ? ( 
           <>
+            {/* --- CAMBIO AQUÍ: Eliminamos initialParams --- */}
             <Stack.Screen name="Main" component={MainScreen} />
             <Stack.Screen name="CrearFlashcard" component={CrearFlashcardScreen} />
             <Stack.Screen name="CatalogoTemario" component={CatalogoTemario} />
@@ -92,5 +130,14 @@ const App = () => {
     </NavigationContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF' 
+  }
+});
 
 export default App;

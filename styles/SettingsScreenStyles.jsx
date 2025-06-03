@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-const SettingsScreenStyles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -28,13 +28,37 @@ const SettingsScreenStyles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 5,
   },
-  input: {
-    borderWidth: 1,
+  input: { 
+    height: 40,
     borderColor: 'gray',
-    padding: 10,
-    marginBottom: 15,
+    borderWidth: 1,
+    marginBottom: 12, 
+    paddingLeft: 8,    
     borderRadius: 5,
   },
+
+  passwordContainer: {
+    flexDirection: 'row',     
+    alignItems: 'center',     
+    height: 40,               
+    borderColor: 'gray',      
+    borderWidth: 1,           
+    borderRadius: 5,          
+    marginBottom: 12,         
+    
+  },
+  passwordInput: {
+    flex: 1,                  
+    height: '100%',           
+    paddingLeft: 8,           
+    paddingRight: 5,          
+  },
+  eyeIcon: {
+    paddingHorizontal: 10,    
+    height: '100%',           
+    justifyContent: 'center', 
+  },
+
   updateButton: {
     backgroundColor: '#9f8b9f',
     padding: 15,
@@ -65,4 +89,4 @@ const SettingsScreenStyles = StyleSheet.create({
   },
 });
 
-export default SettingsScreenStyles;
+export default styles;
