@@ -1,44 +1,25 @@
 // Views/Flashcards/CatalogoTemario.js
-
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  SafeAreaView,
-  Modal,
-  TextInput,
-  Button,
-  Alert,
-  ActivityIndicator,
-  StyleSheet as RNStyleSheet, 
+  View, Text, TouchableOpacity, FlatList, SafeAreaView, Modal, TextInput, Button,
+  Alert, ActivityIndicator, StyleSheet as RNStyleSheet, 
 } from "react-native";
 import { observer } from "mobx-react-lite";
-import { useCatalogoTemarioViewModel } from "../../viewmodels/CatalogoTemarioViewModel";
+import catalogoTemarioViewModel from "../../viewmodels/CatalogoTemarioViewModel"; // Importamos la instancia singleton
 import BottomNavBar from "../../components/BottomNavBar";
-import styles from "../../styles/CatalogoTemarioStyles";
+import styles from "../../styles/CatalogoTemarioStyles"; // Tus estilos
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const CatalogoTemario = observer(({ navigation }) => {
-  const viewModel = useCatalogoTemarioViewModel(); 
+  const viewModel = catalogoTemarioViewModel; 
   const [modalVisible, setModalVisible] = useState(false);
   const [nuevoTemaNombre, setNuevoTemaNombre] = useState("");
 
   useEffect(() => {
-    console.log("[CatalogoTemarioScreen] Montado o viewModel cambió. Intentando cargar temas...");
-    viewModel.cargarTemas();
-  }, [viewModel]); 
-
-  // --- LOGS DE DEPURACIÓN Y SALVAGUARDAS ---
-  console.log("[CatalogoTemarioScreen] Renderizando. viewModel.isLoading:", viewModel.isLoading);
-  console.log("[CatalogoTemarioScreen] Renderizando. viewModel.temas antes de salvaguarda:", viewModel.temas);
-
-  const temasParaFlatList = Array.isArray(viewModel.temas) ? viewModel.temas : [];
-  const hayTemasCargados = temasParaFlatList.length > 0; // Para la condición del ActivityIndicator
-
-  console.log("[CatalogoTemarioScreen] Renderizando. temasParaFlatList (después de salvaguarda):", temasParaFlatList);
-  // --- FIN DE LOGS DE DEPURACIÓN Y SALVAGUARDAS ---
+    console.log("[CatalogoTemarioScreen - Singleton] Montado. ViewModel temas count:", viewModel.temas.length, "isLoading:", viewModel.isLoading);
+    // El singleton carga temas en su constructor. Si necesitas una recarga explícita al entrar a esta pantalla:
+    // viewModel.cargarTemas(); 
+  }, []); // Se ejecuta solo una vez al montar (o añade dependencias si es necesario)
 
   const handleTemaPress = (temaName) => {
     navigation.navigate("CatalogoFlashcards", { temaSeleccionado: temaName });
@@ -92,7 +73,9 @@ const CatalogoTemario = observer(({ navigation }) => {
     );
   };
 
-  // Condición de carga actualizada para ser más robusta
+  const temasParaFlatList = Array.isArray(viewModel.temas) ? viewModel.temas : [];
+  const hayTemasCargados = temasParaFlatList.length > 0;
+
   if (viewModel.isLoading && !hayTemasCargados) { 
     return (
       <SafeAreaView style={[styles.container, localStyles.centered]}>
@@ -107,7 +90,7 @@ const CatalogoTemario = observer(({ navigation }) => {
         <Text style={styles.title}>Temarios</Text>
         {viewModel.error && <Text style={localStyles.errorText}>{viewModel.error}</Text>}
         <FlatList
-          data={temasParaFlatList} // Usamos la variable salvaguardada
+          data={temasParaFlatList}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           ListEmptyComponent={<Text style={localStyles.emptyListText}>No hay temas disponibles. ¡Añade algunos!</Text>}
@@ -147,96 +130,31 @@ const CatalogoTemario = observer(({ navigation }) => {
 
       <View style={styles.bottomNavBar}> 
         <BottomNavBar
+          navigation={navigation}
           onHomePress={() => navigation.navigate("Main")}
           onBookPress={() => navigation.navigate("CatalogoFlashcards")}
           onAddPress={() => navigation.navigate("CrearFlashcard")}
           onListPress={() => navigation.navigate("CatalogoTemario")}
           onSettingsPress={() => navigation.navigate("Settings")}
-          navigation={navigation}
         />
       </View>
     </SafeAreaView>
   );
 });
 
-// (localStyles sigue igual que en el mensaje anterior)
 const localStyles = RNStyleSheet.create({
-  centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  itemContentWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-  },
-  deleteIcon: {
-    padding: 5,
-  },
-  fab: {
-    position: 'absolute',
-    right: 25, 
-    bottom: 75, 
-    backgroundColor: '#6a11cb',
-    width: 60,   
-    height: 60,  
-    borderRadius: 30, 
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 25, 
-    borderRadius: 10,
-    width: '85%', 
-    alignItems: 'center',
-    elevation: 5,
-  },
-  modalTitle: {
-    fontSize: 20, 
-    fontWeight: 'bold',
-    marginBottom: 20, 
-  },
-  modalInput: {
-    width: '100%',
-    borderBottomWidth: 1,
-    borderColor: 'gray',
-    paddingVertical: 10, 
-    paddingHorizontal: 5, 
-    marginBottom: 25, 
-    fontSize: 16, 
-  },
-  modalButtonsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between', 
-    width: '100%',
-  },
-  emptyListText: { 
-    marginTop: 20,
-    fontSize: 16,
-    color: 'gray',
-    textAlign: 'center',
-  },
-  flatListContent: { 
-    paddingBottom: 80, 
-  }
+  centered: { justifyContent: 'center', alignItems: 'center', flex: 1 },
+  errorText: { color: 'red', textAlign: 'center', marginBottom: 10, },
+  itemContentWrapper: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', },
+  deleteIcon: { padding: 5, },
+  fab: { position: 'absolute', right: 25, bottom: 75, backgroundColor: '#6a11cb', width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, },
+  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)', },
+  modalContent: { backgroundColor: 'white', padding: 25, borderRadius: 10, width: '85%', alignItems: 'center', elevation: 5, },
+  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, },
+  modalInput: { width: '100%', borderBottomWidth: 1, borderColor: 'gray', paddingVertical: 10, paddingHorizontal: 5, marginBottom: 25, fontSize: 16, },
+  modalButtonsContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', },
+  emptyListText: { marginTop: 20, fontSize: 16, color: 'gray', textAlign: 'center', },
+  flatListContent: { paddingBottom: 80, }
 });
 
 export default CatalogoTemario;
