@@ -1,54 +1,59 @@
 // Views/Flashcards/CatalogoTemario.js
+
 import React, { useEffect, useState } from "react";
 import {
-  View, Text, TouchableOpacity, FlatList, SafeAreaView, Modal, TextInput, Button,
-  Alert, ActivityIndicator, StyleSheet as RNStyleSheet, 
+  View,
+  Text,
+  TouchableOpacity,
+  FlatList,
+  SafeAreaView,
+  Modal,
+  TextInput,
+  Button,
+  Alert,
+  ActivityIndicator,
+  StyleSheet as RNStyleSheet,
 } from "react-native";
-import { observer } from "mobx-react-lite";
-import catalogoTemarioViewModel from "../../viewmodels/CatalogoTemarioViewModel"; // Importamos la instancia singleton
+import { useCatalogoTemarioViewModel } from "../../viewmodels/CatalogoTemarioViewModel";
 import BottomNavBar from "../../components/BottomNavBar";
-import styles from "../../styles/CatalogoTemarioStyles"; // Tus estilos
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import styles from "../../styles/CatalogoTemarioStyles";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-const CatalogoTemario = observer(({ navigation }) => {
-  const viewModel = catalogoTemarioViewModel; 
+const CatalogoTemario = ({ navigation }) => {
+  const viewModel = useCatalogoTemarioViewModel();
   const [modalVisible, setModalVisible] = useState(false);
-  const [nuevoTemaNombre, setNuevoTemaNombre] = useState("");
+  const [nuevoTemaNombre, setNuevoTemaNombre] = useState([]);
+  const [temas, setTemas] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const cargarTemas = async () => {
+    setIsLoading(true);
+    try {
+      await viewModel.cargarTemas();
+      setTemas(Array.isArray(viewModel.temas) ? viewModel.temas.slice() : []);
+      setError(null);
+    } catch (e) {
+      setError("Error al cargar los temas.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    console.log("[CatalogoTemarioScreen - Singleton] Montado. ViewModel temas count:", viewModel.temas.length, "isLoading:", viewModel.isLoading);
-    // El singleton carga temas en su constructor. Si necesitas una recarga explícita al entrar a esta pantalla:
-    // viewModel.cargarTemas(); 
-  }, []); // Se ejecuta solo una vez al montar (o añade dependencias si es necesario)
+    cargarTemas();
+  }, []);
 
   const handleTemaPress = (temaName) => {
     navigation.navigate("CatalogoFlashcards", { temaSeleccionado: temaName });
   };
 
-  const renderItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.itemContainer}
-      onPress={() => handleTemaPress(item.name)}
-    >
-      <View style={localStyles.itemContentWrapper}>
-        <Text style={styles.itemText}>{item.name}</Text>
-        {!item.isGlobal && (
-          <TouchableOpacity 
-            onPress={() => handleDeleteTema(item)}
-            style={localStyles.deleteIcon}
-          >
-            <MaterialCommunityIcons name="delete-outline" size={24} color="#800080" />
-          </TouchableOpacity>
-        )}
-      </View>
-    </TouchableOpacity>
-  );
-
-  const handleAgregarTema = () => {
+  const handleAgregarTema = async () => {
     if (nuevoTemaNombre.trim()) {
-      viewModel.agregarTema(nuevoTemaNombre.trim());
+      await viewModel.agregarTema(nuevoTemaNombre.trim());
       setNuevoTemaNombre("");
       setModalVisible(false);
+      cargarTemas(); // recarga la lista
     } else {
       Alert.alert("Error", "El nombre del tema no puede estar vacío.");
     }
@@ -64,19 +69,30 @@ const CatalogoTemario = observer(({ navigation }) => {
       `¿Estás seguro de que quieres eliminar el tema "${tema.name}"? Esta acción no se puede deshacer.`,
       [
         { text: "Cancelar", style: "cancel" },
-        { 
-          text: "Eliminar", 
-          onPress: () => viewModel.eliminarTema(tema.id, tema.userId, tema.isGlobal),
-          style: "destructive" 
+        {
+          text: "Eliminar",
+          onPress: async () => {
+            await viewModel.eliminarTema(tema.id, tema.userId, tema.isGlobal);
+            cargarTemas(); // recarga tras eliminar
+          },
+          style: "destructive",
         },
       ]
     );
   };
 
-  const temasParaFlatList = Array.isArray(viewModel.temas) ? viewModel.temas : [];
-  const hayTemasCargados = temasParaFlatList.length > 0;
+  const renderItem = ({ item }) => (
+    <TouchableOpacity style={styles.itemContainer} onPress={() => handleTemaPress(item.name)}>
+      <Text style={styles.itemText}>{item.name}</Text>
+      {!item.isGlobal && (
+        <TouchableOpacity onPress={() => handleDeleteTema(item)} style={localStyles.deleteIcon}>
+          <MaterialCommunityIcons name="delete-outline" size={24} color="#800080" />
+        </TouchableOpacity>
+      )}
+    </TouchableOpacity>
+  );
 
-  if (viewModel.isLoading && !hayTemasCargados) { 
+  if (isLoading && temas.length === 0) {
     return (
       <SafeAreaView style={[styles.container, localStyles.centered]}>
         <ActivityIndicator size="large" color="#6a11cb" />
@@ -88,23 +104,23 @@ const CatalogoTemario = observer(({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Temarios</Text>
-        {viewModel.error && <Text style={localStyles.errorText}>{viewModel.error}</Text>}
+        {error && <Text style={localStyles.errorText}>{error}</Text>}
+
         <FlatList
-          data={temasParaFlatList}
+          data={temas}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
-          ListEmptyComponent={<Text style={localStyles.emptyListText}>No hay temas disponibles. ¡Añade algunos!</Text>}
+          ListEmptyComponent={
+            <Text style={localStyles.emptyListText}>No hay temas disponibles. ¡Añade algunos!</Text>
+          }
           contentContainerStyle={localStyles.flatListContent}
         />
+
+        <TouchableOpacity style={localStyles.nuevoTemaButton} onPress={() => setModalVisible(true)}>
+          <Text style={localStyles.nuevoTemaButtonText}>Nuevo Tema</Text>
+        </TouchableOpacity>
       </View>
-      
-      <TouchableOpacity
-        style={localStyles.fab}
-        onPress={() => setModalVisible(true)}
-      >
-        <MaterialCommunityIcons name="plus" size={30} color="white" />
-      </TouchableOpacity>
-      
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -128,33 +144,93 @@ const CatalogoTemario = observer(({ navigation }) => {
         </View>
       </Modal>
 
-      <View style={styles.bottomNavBar}> 
+      <View style={styles.bottomNavBar}>
         <BottomNavBar
-          navigation={navigation}
           onHomePress={() => navigation.navigate("Main")}
           onBookPress={() => navigation.navigate("CatalogoFlashcards")}
           onAddPress={() => navigation.navigate("CrearFlashcard")}
           onListPress={() => navigation.navigate("CatalogoTemario")}
           onSettingsPress={() => navigation.navigate("Settings")}
+          navigation={navigation}
         />
       </View>
     </SafeAreaView>
   );
-});
+};
 
 const localStyles = RNStyleSheet.create({
-  centered: { justifyContent: 'center', alignItems: 'center', flex: 1 },
-  errorText: { color: 'red', textAlign: 'center', marginBottom: 10, },
-  itemContentWrapper: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: '100%', },
-  deleteIcon: { padding: 5, },
-  fab: { position: 'absolute', right: 25, bottom: 75, backgroundColor: '#6a11cb', width: 60, height: 60, borderRadius: 30, justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.3, shadowRadius: 4, },
-  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)', },
-  modalContent: { backgroundColor: 'white', padding: 25, borderRadius: 10, width: '85%', alignItems: 'center', elevation: 5, },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, },
-  modalInput: { width: '100%', borderBottomWidth: 1, borderColor: 'gray', paddingVertical: 10, paddingHorizontal: 5, marginBottom: 25, fontSize: 16, },
-  modalButtonsContainer: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', },
-  emptyListText: { marginTop: 20, fontSize: 16, color: 'gray', textAlign: 'center', },
-  flatListContent: { paddingBottom: 80, }
+  centered: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorText: {
+    color: "red",
+    textAlign: "center",
+    marginBottom: 10,
+  },
+  deleteIcon: {
+    paddingLeft: 10,
+  },
+  nuevoTemaButton: {
+    backgroundColor: "#6a11cb",
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 12,
+    alignSelf: "center",
+    marginTop: 20,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  nuevoTemaButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    padding: 25,
+    borderRadius: 10,
+    width: "85%",
+    alignItems: "center",
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  modalInput: {
+    width: "100%",
+    borderBottomWidth: 1,
+    borderColor: "gray",
+    paddingVertical: 10,
+    paddingHorizontal: 5,
+    marginBottom: 25,
+    fontSize: 16,
+  },
+  modalButtonsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  emptyListText: {
+    marginTop: 20,
+    fontSize: 16,
+    color: "gray",
+    textAlign: "center",
+  },
+  flatListContent: {
+    paddingBottom: 40,
+  },
 });
 
 export default CatalogoTemario;
