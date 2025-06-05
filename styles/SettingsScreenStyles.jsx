@@ -1,85 +1,80 @@
 import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
+const SettingsScreenStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f8f6fc',
   },
   scrollContent: {
-    paddingHorizontal: 20,
-    paddingBottom: 80,
+    padding: 20,
+    paddingBottom: 100,
+  },
+  card: {
+    backgroundColor: '#ffffff',
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 20,
+    shadowColor: '#aaa',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
   },
   imagePicker: {
     alignItems: 'center',
     marginBottom: 20,
   },
   profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     marginBottom: 10,
   },
   imagePickerText: {
-    color: '#800080',
+    color: '#6a0dad',
     fontSize: 16,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
+    color: '#4b4b4b',
     marginBottom: 5,
   },
-  input: { 
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12, 
-    paddingLeft: 8,    
-    borderRadius: 5,
+  gradientInput: {
+    borderRadius: 12,
+    marginBottom: 15,
+    padding: 1,
   },
-
-  passwordContainer: {
-    flexDirection: 'row',     
-    alignItems: 'center',     
-    height: 40,               
-    borderColor: 'gray',      
-    borderWidth: 1,           
-    borderRadius: 5,          
-    marginBottom: 12,         
-    
+  input: {
+    backgroundColor: '#ffffffcc',
+    borderRadius: 12,
+    padding: 12,
+    fontSize: 16,
+    color: '#333',
   },
-  passwordInput: {
-    flex: 1,                  
-    height: '100%',           
-    paddingLeft: 8,           
-    paddingRight: 5,          
-  },
-  eyeIcon: {
-    paddingHorizontal: 10,    
-    height: '100%',           
-    justifyContent: 'center', 
-  },
-
   updateButton: {
-    backgroundColor: '#9f8b9f',
-    padding: 15,
-    borderRadius: 5,
+    backgroundColor: '#8f5bb3',
+    padding: 14,
+    borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 10,
   },
   updateButtonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   logoutButton: {
-    backgroundColor: '#f44336',
-    padding: 15,
-    borderRadius: 5,
+    backgroundColor: '#d32f2f',
+    padding: 14,
+    borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 20,
+    marginTop: 10,
   },
   logoutButtonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   bottomNavBar: {
     position: 'absolute',
@@ -89,4 +84,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default styles;
+export default SettingsScreenStyles;

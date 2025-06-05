@@ -40,8 +40,9 @@ const styles = StyleSheet.create({
     marginTop: 15 
   },
   forgotPasswordText: { 
-    color: '#000000', 
-    fontSize: 16 
+    color: 'rgba(255, 255, 255, 0.8)', 
+    fontSize: 16, 
+    fontWeight: 'bold'
   },
 });
 

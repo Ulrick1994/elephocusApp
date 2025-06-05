@@ -1,46 +1,50 @@
-import { StyleSheet } from 'react-native';
+// styles/CatalogoTemarioStyles.js
+
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f3f4f6",
   },
   content: {
     flex: 1,
-    padding: 20,
-    alignItems: "center", 
+    paddingHorizontal: 16,
+    paddingTop: 20,
   },
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#6a11cb", 
-    marginBottom: 20,
+    color: "#4a148c",
+    marginBottom: 24,
     textAlign: "center",
   },
   itemContainer: {
-    backgroundColor: "#f9f9f9", 
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    marginBottom: 12,
-    borderRadius: 10,
-    // width: "80%", 
-    width: "100%", 
-    borderColor: "#6a11cb", 
-    borderWidth: 1,
-    elevation: 3, 
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#e0d7f9", // Lila suave
+    paddingVertical: 28,
+    paddingHorizontal: 24,
+    marginBottom: 20,
+    borderRadius: 0, // Sin bordes redondeados
+    borderLeftWidth: 8,
+    borderLeftColor: "#6a11cb",
+    width: "100%",
+    elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
     shadowRadius: 5,
-    alignSelf: 'center', 
   },
   itemText: {
-    fontSize: 18,
-    color: "#6a11cb",
+    fontSize: 22,
+    color: "#4a148c",
     fontWeight: "600",
+    flex: 1,
   },
-  bottomNavBar: { 
-    
+  bottomNavBar: {
+    backgroundColor: "#fff",
+    paddingBottom: 10,
   },
 });
 
