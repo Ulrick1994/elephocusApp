@@ -5,7 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
-  Modal,
   Alert,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -15,6 +14,7 @@ import styles from "../../styles/EventosScreenStyles";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import * as Animatable from "react-native-animatable";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { LinearGradient } from "expo-linear-gradient";
 
 const EventosScreen = ({ navigation }) => {
   const {
@@ -27,6 +27,7 @@ const EventosScreen = ({ navigation }) => {
     cargarEventos,
     eliminarEvento,
     prepararEdicion,
+    eventoEditando,
   } = EventosViewModel();
 
   const [mostrarFechaPicker, setMostrarFechaPicker] = useState(false);
@@ -35,27 +36,38 @@ const EventosScreen = ({ navigation }) => {
     cargarEventos();
   }, []);
 
+  const guardarEvento = async () => {
+    if (!nuevoEvento || !fecha) {
+      Alert.alert("Campos incompletos", "Por favor completa nombre y fecha.");
+      return;
+    }
+
+    await agregarEvento();
+  };
+
   const renderEvento = ({ item }) => (
     <Swipeable
       renderLeftActions={() => (
-        <Animatable.View style={[styles.swipeAction, styles.deleteAction]}>
+        <Animatable.View
+          animation="fadeInLeft"
+          style={[styles.swipeAction, styles.deleteAction]}
+        >
           <Icon name="delete" size={30} color="white" />
         </Animatable.View>
       )}
       renderRightActions={() => (
-        <Animatable.View style={[styles.swipeAction, styles.editAction]}>
+        <Animatable.View
+          animation="fadeInRight"
+          style={[styles.swipeAction, styles.editAction]}
+        >
           <Icon name="pencil" size={30} color="white" />
         </Animatable.View>
       )}
       onSwipeableLeftOpen={() =>
-        Alert.alert(
-          "Eliminar Evento",
-          "¿Deseas eliminar este evento?",
-          [
-            { text: "Cancelar", style: "cancel" },
-            { text: "Eliminar", onPress: () => eliminarEvento(item.id) },
-          ]
-        )
+        Alert.alert("Eliminar Evento", "¿Deseas eliminar este evento?", [
+          { text: "Cancelar", style: "cancel" },
+          { text: "Eliminar", onPress: () => eliminarEvento(item.id) },
+        ])
       }
       onSwipeableRightOpen={() => prepararEdicion(item)}
     >
@@ -73,39 +85,52 @@ const EventosScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>Eventos de Estudio</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre del Evento"
-        value={nuevoEvento}
-        onChangeText={setNuevoEvento}
-      />
-      <TouchableOpacity
-        style={styles.fechaButton}
-        onPress={() => setMostrarFechaPicker(true)}
+      <LinearGradient
+        colors={["#e0c3fc", "#8ec5fc"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.headerGradient}
       >
-        <Text style={styles.fechaButtonText}>
-          {fecha ? `Fecha: ${fecha}` : "Seleccionar Fecha"}
-        </Text>
-      </TouchableOpacity>
+        <Text style={styles.titulo}>Eventos de Estudio</Text>
+      </LinearGradient>
 
-      {mostrarFechaPicker && (
-        <DateTimePicker
-          value={new Date()}
-          mode="date"
-          display="default"
-          onChange={(event, selectedDate) => {
-            setMostrarFechaPicker(false);
-            if (selectedDate) {
-              setFecha(selectedDate.toLocaleDateString());
-            }
-          }}
+      <View style={styles.formContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Nombre del Evento"
+          value={nuevoEvento}
+          onChangeText={setNuevoEvento}
+          placeholderTextColor="#888"
         />
-      )}
 
-      <TouchableOpacity style={styles.botonGuardar} onPress={agregarEvento}>
-        <Text style={styles.botonGuardarTexto}>Guardar Evento</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.fechaButton}
+          onPress={() => setMostrarFechaPicker(true)}
+        >
+          <Icon name="calendar-month-outline" size={26} color="#fff" />
+        </TouchableOpacity>
+        {fecha ? <Text style={styles.fechaSeleccionada}>{fecha}</Text> : null}
+
+        {mostrarFechaPicker && (
+          <DateTimePicker
+            value={new Date()}
+            mode="date"
+            display="default"
+            onChange={(event, selectedDate) => {
+              setMostrarFechaPicker(false);
+              if (selectedDate) {
+                setFecha(selectedDate.toLocaleDateString());
+              }
+            }}
+          />
+        )}
+
+        <TouchableOpacity style={styles.botonGuardar} onPress={guardarEvento}>
+          <Text style={styles.botonGuardarTexto}>
+            {eventoEditando ? "Actualizar Evento" : "Guardar Evento"}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <FlatList
         data={eventos}

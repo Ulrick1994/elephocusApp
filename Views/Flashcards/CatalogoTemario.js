@@ -2,46 +2,22 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  FlatList,
-  SafeAreaView,
-  Modal,
-  TextInput,
-  Button,
-  Alert,
-  ActivityIndicator,
-  StyleSheet as RNStyleSheet,
+  View, Text, TouchableOpacity, FlatList, SafeAreaView, Modal,
+  TextInput, Button, Alert, ActivityIndicator, StyleSheet as RNStyleSheet
 } from "react-native";
-import { useCatalogoTemarioViewModel } from "../../viewmodels/CatalogoTemarioViewModel";
+import { observer } from "mobx-react-lite";
+import { catalogoTemarioStore } from "../../viewmodels/CatalogoTemarioViewModel";
 import BottomNavBar from "../../components/BottomNavBar";
 import styles from "../../styles/CatalogoTemarioStyles";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import Svg, { Defs, LinearGradient, Stop, Path } from "react-native-svg";
 
-const CatalogoTemario = ({ navigation }) => {
-  const viewModel = useCatalogoTemarioViewModel();
+const CatalogoTemario = observer(({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [nuevoTemaNombre, setNuevoTemaNombre] = useState([]);
-  const [temas, setTemas] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const cargarTemas = async () => {
-    setIsLoading(true);
-    try {
-      await viewModel.cargarTemas();
-      setTemas(Array.isArray(viewModel.temas) ? viewModel.temas.slice() : []);
-      setError(null);
-    } catch (e) {
-      setError("Error al cargar los temas.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [nuevoTemaNombre, setNuevoTemaNombre] = useState("");
 
   useEffect(() => {
-    cargarTemas();
+    catalogoTemarioStore.cargarTemas();
   }, []);
 
   const handleTemaPress = (temaName) => {
@@ -50,31 +26,23 @@ const CatalogoTemario = ({ navigation }) => {
 
   const handleAgregarTema = async () => {
     if (nuevoTemaNombre.trim()) {
-      await viewModel.agregarTema(nuevoTemaNombre.trim());
+      await catalogoTemarioStore.agregarTema(nuevoTemaNombre);
       setNuevoTemaNombre("");
       setModalVisible(false);
-      cargarTemas(); // recarga la lista
     } else {
       Alert.alert("Error", "El nombre del tema no puede estar vacío.");
     }
   };
 
   const handleDeleteTema = (tema) => {
-    if (tema.isGlobal) {
-      Alert.alert("Operación no permitida", "No puedes eliminar temas globales.");
-      return;
-    }
     Alert.alert(
       "Confirmar Eliminación",
-      `¿Estás seguro de que quieres eliminar el tema "${tema.name}"? Esta acción no se puede deshacer.`,
+      `¿Eliminar el tema "${tema.name}"? Esta acción no se puede deshacer.`,
       [
         { text: "Cancelar", style: "cancel" },
         {
           text: "Eliminar",
-          onPress: async () => {
-            await viewModel.eliminarTema(tema.id, tema.userId, tema.isGlobal);
-            cargarTemas(); // recarga tras eliminar
-          },
+          onPress: () => catalogoTemarioStore.eliminarTema(tema.id, tema.userId, tema.isGlobal),
           style: "destructive",
         },
       ]
@@ -92,7 +60,7 @@ const CatalogoTemario = ({ navigation }) => {
     </TouchableOpacity>
   );
 
-  if (isLoading && temas.length === 0) {
+  if (catalogoTemarioStore.isLoading) {
     return (
       <SafeAreaView style={[styles.container, localStyles.centered]}>
         <ActivityIndicator size="large" color="#6a11cb" />
@@ -102,12 +70,31 @@ const CatalogoTemario = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Encabezado degradado */}
+      <View style={styles.topGradientContainer}>
+        <Svg height="100%" width="100%" viewBox="0 0 1440 320" style={styles.curveSvg} preserveAspectRatio="none">
+          <Defs>
+            <LinearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+              <Stop offset="0" stopColor="#6a11cb" />
+              <Stop offset="1" stopColor="#2575fc" />
+            </LinearGradient>
+          </Defs>
+          <Path
+            fill="url(#grad)"
+            d="M0,192L60,202.7C120,213,240,235,360,234.7C480,235,600,213,720,192C840,171,960,149,1080,144C1200,139,1320,149,1380,154.7L1440,160L1440,0L1380,0C1320,0,1200,0,1080,0C960,0,840,0,720,0C600,0,480,0,360,0C240,0,120,0,60,0L0,0Z"
+          />
+        </Svg>
+      </View>
+
       <View style={styles.content}>
         <Text style={styles.title}>Temarios</Text>
-        {error && <Text style={localStyles.errorText}>{error}</Text>}
+
+        {catalogoTemarioStore.error && (
+          <Text style={localStyles.errorText}>{catalogoTemarioStore.error}</Text>
+        )}
 
         <FlatList
-          data={temas}
+          data={catalogoTemarioStore.temas}
           renderItem={renderItem}
           keyExtractor={(item) => item.id.toString()}
           ListEmptyComponent={
@@ -156,7 +143,7 @@ const CatalogoTemario = ({ navigation }) => {
       </View>
     </SafeAreaView>
   );
-};
+});
 
 const localStyles = RNStyleSheet.create({
   centered: {

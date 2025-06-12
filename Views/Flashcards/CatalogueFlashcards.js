@@ -69,13 +69,9 @@ const CatalogueFlashcardsScreen = ({ route, navigation }) => {
           <Icon name="delete" size={30} color="white" />
         </Animatable.View>
       )}
-      renderRightActions={() => (
-        <Animatable.View style={[styles.swipeAction, styles.editAction]}>
-          <Icon name="pencil" size={30} color="white" />
-        </Animatable.View>
-      )}
+      
       onSwipeableLeftOpen={() => eliminarFlashcard(item.id)}
-      onSwipeableRightOpen={() => editarFlashcard(item)}
+      
     >
       <TouchableOpacity style={styles.flashcardItem}>
         <Text style={styles.pregunta}>{item.pregunta}</Text>
