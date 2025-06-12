@@ -1,5 +1,7 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useState } from "react";
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import "firebase/compat/firestore";
 
 const useEventosViewModel = () => {
   const [eventos, setEventos] = useState([]);
@@ -7,44 +9,75 @@ const useEventosViewModel = () => {
   const [fecha, setFecha] = useState("");
   const [eventoEditando, setEventoEditando] = useState(null);
 
-  const cargarEventos = async () => {
-    const eventosGuardados = await AsyncStorage.getItem("eventos");
-    setEventos(eventosGuardados ? JSON.parse(eventosGuardados) : []);
-  };
+  const user = firebase.auth().currentUser;
 
-  const guardarEventos = async (nuevosEventos) => {
-    await AsyncStorage.setItem("eventos", JSON.stringify(nuevosEventos));
-    setEventos(nuevosEventos);
+  const cargarEventos = async () => {
+    if (!user) return;
+    try {
+      const eventosRef = firebase
+        .firestore()
+        .collection("users")
+        .doc(user.uid)
+        .collection("eventos");
+
+      const snapshot = await eventosRef.get();
+      const eventosCargados = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setEventos(eventosCargados);
+    } catch (error) {
+      console.error("Error al cargar eventos:", error);
+    }
   };
 
   const agregarEvento = async () => {
-    if (!nuevoEvento || !fecha) return;
+    if (!user || !nuevoEvento || !fecha) return;
 
-    if (eventoEditando) {
-      const eventosActualizados = eventos.map((ev) =>
-        ev.id === eventoEditando.id
-          ? { ...ev, nombre: nuevoEvento, fecha }
-          : ev
-      );
-      await guardarEventos(eventosActualizados);
-      setEventoEditando(null);
-    } else {
-      const nuevo = {
-        id: Date.now(),
-        nombre: nuevoEvento,
-        fecha,
-        flashcards: [],
-      };
-      await guardarEventos([...eventos, nuevo]);
+    try {
+      const eventosRef = firebase
+        .firestore()
+        .collection("users")
+        .doc(user.uid)
+        .collection("eventos");
+
+      if (eventoEditando) {
+        await eventosRef.doc(eventoEditando.id).update({
+          nombre: nuevoEvento,
+          fecha,
+        });
+        setEventoEditando(null);
+      } else {
+        await eventosRef.add({
+          nombre: nuevoEvento,
+          fecha,
+          flashcards: [],
+        });
+      }
+
+      setNuevoEvento("");
+      setFecha("");
+      cargarEventos();
+    } catch (error) {
+      console.error("Error al agregar evento:", error);
     }
-
-    setNuevoEvento("");
-    setFecha("");
   };
 
   const eliminarEvento = async (id) => {
-    const eventosActualizados = eventos.filter((e) => e.id !== id);
-    await guardarEventos(eventosActualizados);
+    if (!user) return;
+    try {
+      const eventoRef = firebase
+        .firestore()
+        .collection("users")
+        .doc(user.uid)
+        .collection("eventos")
+        .doc(id);
+
+      await eventoRef.delete();
+      cargarEventos();
+    } catch (error) {
+      console.error("Error al eliminar evento:", error);
+    }
   };
 
   const prepararEdicion = (evento) => {
