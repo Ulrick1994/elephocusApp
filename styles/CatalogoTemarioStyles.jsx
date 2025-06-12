@@ -1,11 +1,22 @@
 // styles/CatalogoTemarioStyles.js
 
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f3f4f6",
+    backgroundColor: "#fff",
+  },
+  topGradientContainer: {
+    height: 180,
+    overflow: "hidden",
+    backgroundColor: "#6a11cb", // Fallback color
+  },
+  curveSvg: {
+    position: "absolute",
+    bottom: -1,
+    left: 0,
+    right: 0,
   },
   content: {
     flex: 1,
@@ -22,11 +33,11 @@ const styles = StyleSheet.create({
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#e0d7f9", // Lila suave
+    backgroundColor: "#e0d7f9",
     paddingVertical: 28,
     paddingHorizontal: 24,
     marginBottom: 20,
-    borderRadius: 0, // Sin bordes redondeados
+    borderRadius: 0,
     borderLeftWidth: 8,
     borderLeftColor: "#6a11cb",
     width: "100%",
