@@ -1,6 +1,6 @@
 // styles/CatalogoTemarioStyles.js
 
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet } from "react-native";
 
 const styles = StyleSheet.create({
   container: {
@@ -8,10 +8,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   topGradientContainer: {
-    height: 180,
-    overflow: "hidden",
-    backgroundColor: "#6a11cb", // Fallback color
+    width: "100%",
+    height: 150,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    backgroundColor: "#f6f0fc", // similar al gradiente superior
   },
+
+  headerGradient: {
+    width: "100%",
+    height: 150,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingTop: 40,
+  },
+
+
   curveSvg: {
     position: "absolute",
     bottom: -1,
@@ -23,13 +38,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 20,
   },
+
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#4a148c",
-    marginBottom: 24,
+    fontSize: 24,
+    fontWeight: "600",
+    fontFamily: "Poppins_500Medium",
+    color: "#fff",
     textAlign: "center",
+    textShadowColor: "#00000044",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 4,
   },
+
   itemContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -52,6 +72,74 @@ const styles = StyleSheet.create({
     color: "#4a148c",
     fontWeight: "600",
     flex: 1,
+  },
+  addButton: {
+    backgroundColor: "#6a11cb",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignSelf: "center",
+    marginBottom: 16,
+  },
+  addButtonText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#4a148c",
+    textAlign: "center",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 10,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  cancelButton: {
+    backgroundColor: "#ccc",
+    padding: 10,
+    borderRadius: 8,
+    flex: 1,
+    marginRight: 5,
+  },
+  confirmButton: {
+    backgroundColor: "#6a11cb",
+    padding: 10,
+    borderRadius: 8,
+    flex: 1,
+    marginLeft: 5,
+  },
+  cancelButtonText: {
+    textAlign: "center",
+    color: "#333",
+    fontWeight: "bold",
+  },
+  confirmButtonText: {
+    textAlign: "center",
+    color: "#fff",
+    fontWeight: "bold",
   },
   bottomNavBar: {
     backgroundColor: "#fff",
